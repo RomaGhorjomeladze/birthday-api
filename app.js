@@ -8,6 +8,9 @@ const morgan = require('morgan')
 
 app.use(cors('*'))
 app.use(morgan("dev"))
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }));
+
 
 const userRoutes = require('./routes/userRouter')
 const eventRoutes = require('./routes/eventRouter')

@@ -1,5 +1,7 @@
 const router = require('express').Router()
-const {} = require('../controllers/eventController')
+const {createEvent} = require('../controllers/eventController')
+
+router.post('/createevent', createEvent)
 
 
 module.exports = router
