@@ -11,7 +11,8 @@ const UserSchema = new mongoose.Schema({
     require: true
   },
   avatar: {
-    type: String
+    imageid: { type: String },
+    imageurl: { type: String }
   },
   lastname: {
     type: String,
@@ -34,7 +35,6 @@ const UserSchema = new mongoose.Schema({
   successful: {
     type: Number,
     default: 0
-
   },
   unSuccessful: {
     type: Number,
@@ -46,7 +46,7 @@ UserSchema.methods.generateAuthToken = function() {
   const token = jwt.sign({ _id: this._id }, process.env.JWTSECRET, {
     expiresIn: "24h"
   });
-  return token
+  return token;
 };
 
-module.exports = mongoose.model('User', UserSchema)
+module.exports = mongoose.model("User", UserSchema);

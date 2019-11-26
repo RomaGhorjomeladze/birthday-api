@@ -1,6 +1,6 @@
 const bcrypt = require("bcrypt");
 const User = require("../models/userModel");
-const jwt = require("jsonwebtoken");
+const cloudinary = require("cloudinary").v2;
 require("dotenv").config();
 
 exports.signUp = async (req, res) => {
@@ -15,13 +15,32 @@ exports.signUp = async (req, res) => {
           .json({ error: "Password's length must be at least 6 characters" });
       } else {
         bcrypt.hash(req.body.password, 10, async (err, hash) => {
-          let user = new User({
-            ...req.body,
-            password: hash,
-            avatar: req.imageName
-          });
-          const newUser = await user.save();
-          return res.status(200).json(newUser);
+          let tempBuffer = req.file.buffer;
+          try {
+            let uploaded = await cloudinary.uploader
+              .upload_stream(
+                {
+                  resource_type: "image",
+                  folder: "users",
+                  width: 250,
+                  height: 250,
+                  crop: "fit"
+                },
+                async (error, result) => {
+                  let user = new User({
+                    ...req.body,
+                    password: hash,
+                    avatar: { imageid: result.public_id, imageurl: result.url }
+                  });
+                  const newUser = await user.save();
+                  return res.status(200).json(newUser);
+                }
+              )
+              .end(tempBuffer);
+          } catch (error) {
+            console.log(error);
+            res.status(400).json(error);
+          }
         });
       }
     }
@@ -44,6 +63,7 @@ exports.signIn = async (req, res) => {
         let token = currentUser.generateAuthToken();
         res.status(200).json({ user: currentUser, token });
       } else {
+        console.log("here");
         res.status(400).json({ error: "incorrect password" });
       }
     }
@@ -52,6 +72,12 @@ exports.signIn = async (req, res) => {
   }
 };
 
-exports.autoLogin = (req,res)=>{
-    res.status(200).json({user: req.user})
-}
+exports.autoLogin = (req, res) => {
+  res.status(200).json({ user: req.user });
+};
+
+exports.getImage = async (req, res) => {
+  let user = await User.findOne({ _id: req.params.id });
+  console.log(user);
+  res.json(user);
+};

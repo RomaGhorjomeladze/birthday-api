@@ -13,7 +13,7 @@ exports.isAuthenticated = async (req, res, next) => {
         "-password -__v"
       );
       if (!user) {
-        res.status(400).json({ error: "Unauthenticated user" });
+        res.status(400).json({ error: "user doesn't exists" });
       } else {
         req.user = user;
         next();

@@ -1,14 +1,22 @@
-const router = require('express').Router()
-const multer = require('multer')
-const {storage} = require('../helper/storage')
+const router = require("express").Router();
+const multer = require("multer");
 
-const {isAuthenticated} = require('../middlewares/userMiddleware')
+const storage = multer.memoryStorage();
 
-var upload = multer({storage: storage})
-const {signUp, signIn, autoLogin} = require('../controllers/userController')
+const { isAuthenticated } = require("../middlewares/userMiddleware");
 
-router.post('/signup', upload.single('file'),  signUp)
-router.post('/signin/',   signIn)
-router.post('/autologin', isAuthenticated, autoLogin)
+var upload = multer({ storage: storage });
+const {
+  signUp,
+  signIn,
+  autoLogin,
+  getImage
+} = require("../controllers/userController");
 
-module.exports = router
+router.post("/signup", upload.single("file"), signUp);
+router.post("/signin/", signIn);
+router.post("/autologin", isAuthenticated, autoLogin);
+
+router.get("/uploads/:id", getImage);
+
+module.exports = router;
